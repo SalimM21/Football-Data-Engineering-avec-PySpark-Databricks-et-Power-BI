@@ -1,0 +1,78 @@
+# spark_config.py
+"""
+Spark Configuration Module
+--------------------------
+Ce module initialise et configure la session Spark pour le projet
+'Football Data Analytics (Bundesliga 2000–2015)'.
+
+Fonctionnalités :
+- Détection automatique de l'environnement (local, Databricks, cluster).
+- Configuration optimisée de la mémoire, des partitions et de l'exécution.
+- Logique de création unique de SparkSession.
+"""
+
+from pyspark.sql import SparkSession
+import os
+
+
+def get_spark_session(app_name: str = "FootballAnalytics", env: str = None) -> SparkSession:
+    """
+    Crée ou récupère une SparkSession selon l'environnement.
+
+    :param app_name: Nom de l'application Spark.
+    :param env: Environnement d'exécution ('local', 'databricks', 'cluster').
+    :return: SparkSession configurée.
+    """
+
+    # Détection automatique si non précisée
+    if env is None:
+        if "DATABRICKS_RUNTIME_VERSION" in os.environ:
+            env = "databricks"
+        else:
+            env = "local"
+
+    builder = SparkSession.builder.appName(app_name)
+
+    # Configuration spécifique à l'environnement
+    if env == "local":
+        builder = (
+            builder
+            .master("local[*]")
+            .config("spark.sql.shuffle.partitions", "4")
+            .config("spark.driver.memory", "4g")
+            .config("spark.executor.memory", "2g")
+            .config("spark.ui.showConsoleProgress", "true")
+        )
+    elif env == "databricks":
+        builder = (
+            builder
+            .config("spark.sql.shuffle.partitions", "200")
+            .config("spark.databricks.io.cache.enabled", "true")
+            .config("spark.sql.execution.arrow.pyspark.enabled", "true")
+        )
+    elif env == "cluster":
+        builder = (
+            builder
+            .config("spark.dynamicAllocation.enabled", "true")
+            .config("spark.executor.memory", "8g")
+            .config("spark.executor.cores", "4")
+            .config("spark.driver.memory", "8g")
+        )
+    else:
+        raise ValueError(f"Environnement Spark inconnu : {env}")
+
+    spark = builder.getOrCreate()
+
+    print(f"✅ SparkSession initialisée avec succès — Environnement : {env.upper()}")
+    print(f"Version Spark : {spark.version}")
+
+    return spark
+
+
+if __name__ == "__main__":
+    # Test rapide de la configuration
+    spark = get_spark_session()
+    print("SparkContext actif :", spark.sparkContext.appName)
+    df_test = spark.createDataFrame([(1, "Bundesliga"), (2, "LaLiga")], ["ID", "League"])
+    df_test.show()
+    spark.stop()
