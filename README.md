@@ -1,4 +1,4 @@
-# ⚽ Football Performance Analysis Pipeline (PySpark)
+# ⚽ Football Performance Analysis Pipeline avec PySpark, Databricks et Power BI
 
 ## 📖 Contexte du projet
 
@@ -136,7 +136,7 @@ football-pyspark-pipeline/
 
 ## 🧱 Commandes utiles
 
-### ▶️ Lancer le pipeline (dans un notebook Colab)
+### Lancer le pipeline (dans un notebook Colab)
 ```python
 !pip install pyspark
 from pyspark.sql import SparkSession
@@ -144,18 +144,16 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName("FootballAnalysis").getOrCreate()
 df = spark.read.csv("/content/football_matches.csv", header=True, inferSchema=True)
 ```
-### 💾 Sauvegarde en Parquet partitionné
+### Sauvegarde en Parquet partitionné
 ```python
 df_final.write.mode("overwrite").partitionBy("Season").parquet("/content/football_stats_partitioned")
 ```
 
-### 📈 Lecture du Parquet
+### Lecture du Parquet
 ```python
 df = spark.read.parquet("/content/football_stats_partitioned")
 df.printSchema()
 ```
-# ⚽ Football Data Engineering avec PySpark, Databricks et Power BI
-
 ## 🏆 Résultats attendus
 
 ### 📂 Datasets générés
@@ -227,8 +225,7 @@ df.printSchema()
 
 ## 🏁 Conclusion
 
-Ce projet illustre la **mise en œuvre complète d’un pipeline de données PySpark**,  
-depuis la **préparation** jusqu’à la **visualisation**, en appliquant les **bonnes pratiques d’ingénierie de données**,  
+Ce projet illustre la **mise en œuvre complète d’un pipeline de données PySpark**, depuis la **préparation** jusqu’à la **visualisation**, en appliquant les **bonnes pratiques d’ingénierie de données**,  
 ainsi que les principes d’**optimisation des performances** et de **déploiement sur Databricks et Power BI**.
 
 
