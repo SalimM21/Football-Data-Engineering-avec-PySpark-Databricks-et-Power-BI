@@ -225,8 +225,7 @@ df.printSchema()
 
 ## 🏁 Conclusion
 
-Ce projet illustre la **mise en œuvre complète d’un pipeline de données PySpark**, depuis la **préparation** jusqu’à la **visualisation**, en appliquant les **bonnes pratiques d’ingénierie de données**,  
-ainsi que les principes d’**optimisation des performances** et de **déploiement sur Databricks et Power BI**.
+Ce projet illustre la **mise en œuvre complète d’un pipeline de données PySpark**, depuis la **préparation** jusqu’à la **visualisation**, en appliquant les **bonnes pratiques d’ingénierie de données**, ainsi que les principes d’**optimisation des performances** et de **déploiement sur Databricks et Power BI**.
 
 
 
