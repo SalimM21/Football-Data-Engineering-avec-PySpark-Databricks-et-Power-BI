@@ -75,26 +75,56 @@ Ce projet a pour objectif de construire un **pipeline PySpark complet** permetta
 ## 🧩 Structure du projet
 
 ```
-football-pyspark-pipeline/
-│
-├── notebooks/
-│ └── football_analysis_pyspark.ipynb # Notebook Google Colab ou Databricks
-│
-├── src/
-│ └── pipeline_utils.py # Fonctions PySpark (agrégations, KPIs, ranking)
+football-performance-pipeline/
 │
 ├── data/
-│ ├── football_matches.csv # Données sources
-│ ├── football_stats_partitioned/ # Parquet partitionné par saison
-│ └── football_top_teams/ # Champions
+│   ├── raw/                     # Données CSV brutes
+│   │   └── football_matches.csv
+│   ├── processed/               # Données transformées (parquet)
+│   │   ├── football_stats_partitioned/
+│   │   └── football_top_teams/
+│   └── tests/                   # Jeux de données miniatures pour tests
+│       └── sample_data.csv
 │
-├── visuals/
-│ ├── win_percentage_champions.png
-│ ├── goals_scored_champions.png
-│ └── goal_differentials_champions.png
+├── src/
+│   ├── __init__.py
+│   ├── config/
+│   │   └── spark_config.py      # Configuration SparkSession
+│   ├── ingestion/
+│   │   └── load_data.py         # Chargement CSV → DataFrame
+│   ├── transformation/
+│   │   ├── prepare_columns.py   # Nettoyage, renommage
+│   │   ├── indicators.py        # Colonnes indicatrices (HomeTeamWin, etc.)
+│   │   ├── filter_data.py       # Filtrage D1 + saisons 2000–2015
+│   │   ├── aggregations.py      # GroupBy domicile / extérieur
+│   │   ├── merge_data.py        # Fusion home/away
+│   │   ├── metrics.py           # Colonnes synthétiques + KPIs
+│   │   └── ranking.py           # Classement via Window Functions
+│   ├── export/
+│   │   └── save_parquet.py      # Sauvegarde des Parquet
+│   ├── visualization/
+│   │   └── charts.py            # Graphiques Matplotlib / Seaborn
+│   └── pipeline.py              # Script principal orchestrant le pipeline
 │
-├── footballcolumnsdocumentation.pdf # Documentation colonnes
-└── README.md
+├── tests/
+│   ├── __init__.py
+│   ├── test_ingestion.py        # Tests du chargement
+│   ├── test_transformation.py   # Tests transformations & indicateurs
+│   ├── test_metrics.py          # Tests des calculs de KPI
+│   ├── test_ranking.py          # Tests de classement
+│   └── test_export.py           # Tests du format Parquet
+│
+├── notebooks/
+│   ├── pipeline_exploration.ipynb   # Exploration initiale
+│   └── debug_visuals.ipynb          # Debug + visualisation
+│
+├── logs/
+│   └── pipeline.log              # Logs détaillés d’exécution
+│
+├── requirements.txt              # Dépendances (PySpark, pytest, matplotlib...)
+├── README.md                     # Documentation du projet
+└── .gitignore                    # Fichiers à ignorer (parquet, cache, logs)
+
 
 ```
 
