@@ -30,6 +30,70 @@ Ce projet a pour objectif de construire un **pipeline PySpark complet** permetta
 
 ## ⚙️ Architecture du pipeline
 
+```mermaid
+flowchart TB
+    %% ========================
+    %%  Architecture du pipeline football
+    %% ========================
+
+    %% Chargement et préparation des données
+    subgraph LOAD[" Chargement & préparation des données"]
+        LOAD1(["Import CSV dans DataFrame PySpark"])
+        LOAD2(["Nettoyage & renommage des colonnes (footballcolumnsdocumentation.pdf)"])
+        LOAD3(["Création colonnes supplémentaires : HomeTeamWin, AwayTeamWin, GameTie"])
+    end
+
+    %% Filtrage des données
+    subgraph FILTER[" Filtrage des données"]
+        FILTER1(["Conserver uniquement Bundesliga (Div = D1)"])
+        FILTER2(["Période : 2000 à 2015"])
+    end
+
+    %% Agrégations
+    subgraph AGG[" Agrégations"]
+        AGG1(["df_home_matches : statistiques domicile"])
+        AGG2(["df_away_matches : statistiques extérieur"])
+        AGG3(["Jointure → df_merged"])
+    end
+
+    %% Calcul des KPI
+    subgraph KPI[" Calcul KPI"]
+        KPI1(["Colonnes totales : GoalsScored, GoalsAgainst, Win, Loss, Tie"])
+        KPI2(["Colonnes avancées : GoalDifferentials, WinPercentage, GoalsPerGame, GoalsAgainstPerGame"])
+    end
+
+    %% Classement des équipes
+    subgraph RANK[" Classement des équipes"]
+        RANK1(["Window Functions : classement par WinPercentage, GoalDifferentials"])
+        RANK2(["Extraction du champion : TeamPosition = 1"])
+    end
+
+    %% Sauvegarde optimisée
+    subgraph SAVE[" Sauvegarde optimisée"]
+        SAVE1(["football_stats_partitioned : toutes les équipes, partitionné par saison"])
+        SAVE2(["football_top_teams : champions uniquement"])
+    end
+
+    %% Visualisation
+    subgraph VIS["📊 Visualisation"]
+        VIS1(["Graphiques % victoires des champions"])
+        VIS2(["Nombre de buts marqués"])
+        VIS3(["GoalDifferentials par saison"])
+        VIS4(["Outils : Pandas / Matplotlib / Power BI"])
+    end
+
+    %% ========================
+    %%  Flux
+    %% ========================
+    LOAD1 --> LOAD2 --> LOAD3 --> FILTER1 --> FILTER2 --> AGG1 --> AGG2 --> AGG3
+    AGG3 --> KPI1 --> KPI2 --> RANK1 --> RANK2 --> SAVE1 --> SAVE2 --> VIS1
+    SAVE2 --> VIS2
+    SAVE2 --> VIS3
+    VIS1 --> VIS4
+    VIS2 --> VIS4
+    VIS3 --> VIS4
+
+```
 ### Étapes principales :
 
 1. **Chargement et préparation des données**
