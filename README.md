@@ -33,58 +33,72 @@ Ce projet a pour objectif de construire un **pipeline PySpark complet** permetta
 ```mermaid
 flowchart TB
     %% ========================
-    %%  Architecture du pipeline football
+    %% 🎯 ARCHITECTURE DU PIPELINE FOOTBALL
     %% ========================
 
-    %% Chargement et préparation des données
-    subgraph LOAD[" Chargement & préparation des données"]
-        LOAD1(["Import CSV dans DataFrame PySpark"])
-        LOAD2(["Nettoyage & renommage des colonnes (footballcolumnsdocumentation.pdf)"])
-        LOAD3(["Création colonnes supplémentaires : HomeTeamWin, AwayTeamWin, GameTie"])
-    end
+    %% === DÉFINITIONS DES STYLES ===
+    classDef load fill:#D6EAF8,stroke:#2E86C1,stroke-width:2px,color:#000,font-weight:bold;        %% Bleu clair
+    classDef filter fill:#D1F2EB,stroke:#117864,stroke-width:2px,color:#000,font-weight:bold;      %% Vert clair
+    classDef agg fill:#FDEBD0,stroke:#CA6F1E,stroke-width:2px,color:#000,font-weight:bold;         %% Orange clair
+    classDef kpi fill:#FADBD8,stroke:#C0392B,stroke-width:2px,color:#000,font-weight:bold;         %% Rouge clair
+    classDef rank fill:#E8DAEF,stroke:#7D3C98,stroke-width:2px,color:#000,font-weight:bold;        %% Violet
+    classDef save fill:#FCF3CF,stroke:#B7950B,stroke-width:2px,color:#000,font-weight:bold;        %% Jaune clair
+    classDef vis fill:#D5F5E3,stroke:#27AE60,stroke-width:2px,color:#000,font-weight:bold;         %% Vert tendre
 
-    %% Filtrage des données
-    subgraph FILTER[" Filtrage des données"]
-        FILTER1(["Conserver uniquement Bundesliga (Div = D1)"])
-        FILTER2(["Période : 2000 à 2015"])
+    %% === 1️⃣ CHARGEMENT & PRÉPARATION ===
+    subgraph LOAD["📥 Chargement & préparation des données"]
+        LOAD1(["📂 Import CSV dans DataFrame PySpark"])
+        LOAD2(["🧹 Nettoyage & renommage des colonnes (footballcolumnsdocumentation.pdf)"])
+        LOAD3(["➕ Création colonnes supplémentaires : HomeTeamWin, AwayTeamWin, GameTie"])
     end
+    class LOAD1,LOAD2,LOAD3 load;
 
-    %% Agrégations
-    subgraph AGG[" Agrégations"]
-        AGG1(["df_home_matches : statistiques domicile"])
-        AGG2(["df_away_matches : statistiques extérieur"])
-        AGG3(["Jointure → df_merged"])
+    %% === 2️⃣ FILTRAGE ===
+    subgraph FILTER["🔎 Filtrage des données"]
+        FILTER1(["⚽ Conserver uniquement Bundesliga (Div = D1)"])
+        FILTER2(["📅 Période : 2000 à 2015"])
     end
+    class FILTER1,FILTER2 filter;
 
-    %% Calcul des KPI
-    subgraph KPI[" Calcul KPI"]
-        KPI1(["Colonnes totales : GoalsScored, GoalsAgainst, Win, Loss, Tie"])
-        KPI2(["Colonnes avancées : GoalDifferentials, WinPercentage, GoalsPerGame, GoalsAgainstPerGame"])
+    %% === 3️⃣ AGRÉGATIONS ===
+    subgraph AGG["🧮 Agrégations"]
+        AGG1(["🏠 df_home_matches : statistiques domicile"])
+        AGG2(["🚗 df_away_matches : statistiques extérieur"])
+        AGG3(["🔗 Jointure → df_merged"])
     end
+    class AGG1,AGG2,AGG3 agg;
 
-    %% Classement des équipes
-    subgraph RANK[" Classement des équipes"]
-        RANK1(["Window Functions : classement par WinPercentage, GoalDifferentials"])
-        RANK2(["Extraction du champion : TeamPosition = 1"])
+    %% === 4️⃣ KPI ===
+    subgraph KPI["📊 Calcul des KPI"]
+        KPI1(["⚡ Colonnes totales : GoalsScored, GoalsAgainst, Win, Loss, Tie"])
+        KPI2(["📈 Colonnes avancées : GoalDifferentials, WinPercentage, GoalsPerGame, GoalsAgainstPerGame"])
     end
+    class KPI1,KPI2 kpi;
 
-    %% Sauvegarde optimisée
-    subgraph SAVE[" Sauvegarde optimisée"]
-        SAVE1(["football_stats_partitioned : toutes les équipes, partitionné par saison"])
-        SAVE2(["football_top_teams : champions uniquement"])
+    %% === 5️⃣ CLASSEMENT ===
+    subgraph RANK["🏆 Classement des équipes"]
+        RANK1(["📊 Window Functions : classement par WinPercentage, GoalDifferentials"])
+        RANK2(["🥇 Extraction du champion : TeamPosition = 1"])
     end
+    class RANK1,RANK2 rank;
 
-    %% Visualisation
-    subgraph VIS["📊 Visualisation"]
-        VIS1(["Graphiques % victoires des champions"])
-        VIS2(["Nombre de buts marqués"])
-        VIS3(["GoalDifferentials par saison"])
-        VIS4(["Outils : Pandas / Matplotlib / Power BI"])
+    %% === 6️⃣ SAUVEGARDE ===
+    subgraph SAVE["💾 Sauvegarde optimisée"]
+        SAVE1(["🗂 football_stats_partitioned : toutes les équipes, partitionné par saison"])
+        SAVE2(["🏅 football_top_teams : champions uniquement"])
     end
+    class SAVE1,SAVE2 save;
 
-    %% ========================
-    %%  Flux
-    %% ========================
+    %% === 7️⃣ VISUALISATION ===
+    subgraph VIS["📉 Visualisation & Reporting"]
+        VIS1(["📊 Graphiques % victoires des champions"])
+        VIS2(["⚽ Nombre de buts marqués"])
+        VIS3(["📈 GoalDifferentials par saison"])
+        VIS4(["🧰 Outils : Pandas / Matplotlib / Power BI"])
+    end
+    class VIS1,VIS2,VIS3,VIS4 vis;
+
+    %% === 🔄 FLUX DU PIPELINE ===
     LOAD1 --> LOAD2 --> LOAD3 --> FILTER1 --> FILTER2 --> AGG1 --> AGG2 --> AGG3
     AGG3 --> KPI1 --> KPI2 --> RANK1 --> RANK2 --> SAVE1 --> SAVE2 --> VIS1
     SAVE2 --> VIS2
@@ -92,6 +106,7 @@ flowchart TB
     VIS1 --> VIS4
     VIS2 --> VIS4
     VIS3 --> VIS4
+
 
 ```
 ### Étapes principales :
